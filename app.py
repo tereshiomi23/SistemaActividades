@@ -1,164 +1,151 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import datetime
 
-app = Flask(__name__)
-# Clave para cifrar las sesiones y mensajes flash
+# --- CONFIGURACIÓN DE LA APLICACIÓN ---
+app = Flask(__name__, instance_relative_config=True)
 app.secret_key = 'pequiven_sistema_seguro_2026'
 
-# --- 1. CONFIGURACIÓN ---
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gestion_actividades.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+# Configuración de carpetas (Base de datos y Fotos)
+try:
+    os.makedirs(app.instance_path)
+    os.makedirs(os.path.join('static', 'uploads'), exist_ok=True)
+except OSError:
+    pass
 
-# Crear carpeta de fotos si no existe
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'gestion_actividades.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# --- 2. MODELOS DE BASE DE DATOS ---
+# --- MODELOS DE BASE DE DATOS ---
 
-class Usuario(db.Model):
+class Usuarios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
+    nombre_usuario = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    rol = db.Column(db.String(20), nullable=False) # admin, gerente, coordinador, analista, planificador
+    rol = db.Column(db.String(20), default='analista')
 
-class Actividad(db.Model):
+class Actividades(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.String(10))
-    tipo_programa = db.Column(db.String(100))
-    tipo_actividad = db.Column(db.String(100))
-    coordinacion = db.Column(db.String(100))
-    descripcion = db.Column(db.String(200))
-    beneficiarios = db.Column(db.Integer)
-    ubicacion = db.Column(db.String(100))
-    tipo_ayuda = db.Column(db.String(100))
-    cantidad_ayuda = db.Column(db.Integer)
-    foto = db.Column(db.String(200))
-    usuario_creador = db.Column(db.String(50)) # Rastreo de quién cargó el dato
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    fecha_actividad = db.Column(db.Date, nullable=False)
+    programa_gestion = db.Column(db.String(100), nullable=False)
+    tipo_actividad = db.Column(db.String(100), nullable=False)
+    nombre_institucion = db.Column(db.String(200), nullable=False)
+    descripcion_actividad = db.Column(db.Text, nullable=False)
+    personal_asistio = db.Column(db.Text, nullable=False)
+    direccion = db.Column(db.Text, nullable=False)
+    cantidad_beneficiarios = db.Column(db.Integer, default=0)
+    
+    # Campos para guardar los nombres de las imágenes
+    foto1 = db.Column(db.String(255), nullable=True)
+    foto2 = db.Column(db.String(255), nullable=True)
+    foto3 = db.Column(db.String(255), nullable=True)
 
-# --- 3. RUTAS DE SESIÓN ---
+# --- FUNCIONES DE APOYO ---
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1).lower() in app.config['ALLOWED_EXTENSIONS']
+
+# --- RUTAS ---
+
+@app.route('/')
+def home():
+    if 'user_id' in session:
+        return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = Usuario.query.filter_by(username=request.form['username']).first()
-        if user and check_password_hash(user.password, request.form['password']):
-            session['user_id'] = user.id
-            session['rol'] = user.rol
-            session['username'] = user.username
-            flash(f'Bienvenido/a {user.username}', 'success')
+        usuario = request.form['username']
+        password = request.form['password']
+        user = Usuarios.query.filter_by(nombre_usuario=usuario).first()
+        if user and check_password_hash(user.password, password):
+            session.update({'user_id': user.id, 'username': user.nombre_usuario, 'rol': user.rol})
             return redirect(url_for('index'))
-        flash('Usuario o contraseña incorrecta', 'danger')
+        flash('Usuario o contraseña incorrectos', 'danger')
     return render_template('login.html')
+
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        try:
+            # Procesamiento de las 3 imágenes
+            nombres_fotos = []
+            for i in range(1, 4):
+                f = request.files.get(f'foto{i}')
+                if f and f.filename != '' and allowed_file(f.filename):
+                    # Nombre único: fecha_hora_numero_nombreoriginal.jpg
+                    ext = f.filename.rsplit('.', 1).lower()
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                    filename = secure_filename(f"{timestamp}_{i}.{ext}")
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    nombres_fotos.append(filename)
+                else:
+                    nombres_fotos.append(None)
+
+            nueva_acta = Actividades(
+                usuario_id=session['user_id'],
+                fecha_actividad=datetime.strptime(request.form['fecha_actividad'], '%Y-%m-%d'),
+                programa_gestion=request.form['programa_gestion'],
+                tipo_actividad=request.form['tipo_actividad'],
+                nombre_institucion=request.form['nombre_institucion'],
+                descripcion_actividad=request.form['descripcion_actividad'],
+                personal_asistio=request.form['personal_asistio'],
+                direccion=request.form['direccion'],
+                cantidad_beneficiarios=int(request.form['cantidad_beneficiarios'] or 0),
+                foto1=nombres_fotos,
+                foto2=nombres_fotos,
+                foto3=nombres_fotos
+            )
+            db.session.add(nueva_acta)
+            db.session.commit()
+            flash('Actividad y fotos guardadas con éxito', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al guardar: {str(e)}', 'danger')
+            
+    return render_template('index.html')
+
+@app.route('/consultar')
+def consultar():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    query = Actividades.query.order_by(Actividades.fecha_actividad.desc())
+    if session.get('rol') in ['administrador', 'gerente', 'admin']:
+        actividades_list = query.all()
+    else:
+        actividades_list = query.filter_by(usuario_id=session['user_id']).all()
+        
+    return render_template('consultar.html', actividades=actividades_list)
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# --- 4. RUTAS PRINCIPALES ---
-
-@app.route('/')
-def index():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('index.html')
-
-@app.route('/registrar', methods=['POST'])
-def registrar():
-    if 'user_id' not in session: 
-        return redirect(url_for('login'))
-    
-    file = request.files.get('foto')
-    filename = None
-    if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-    try:
-        nueva = Actividad(
-            fecha=request.form.get('fecha'),
-            tipo_programa=request.form.get('tipo_programa'),
-            tipo_actividad=request.form.get('tipo_actividad'),
-            coordinacion=request.form.get('coordinacion'),
-            descripcion=request.form.get('descripcion'),
-            beneficiarios=int(request.form.get('beneficiarios') or 0),
-            ubicacion=request.form.get('ubicacion'),
-            tipo_ayuda=request.form.get('tipo_ayuda'),
-            cantidad_ayuda=int(request.form.get('cantidad_ayuda') or 0),
-            foto=filename,
-            usuario_creador=session['username']
-        )
-        db.session.add(nueva)
-        db.session.commit()
-        flash('Registro guardado correctamente 🚀', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error al guardar: {str(e)}', 'danger')
-
-    return redirect(url_for('index'))
-
-@app.route('/consultar')
-def consultar():
-    if 'user_id' not in session: 
-        return redirect(url_for('login'))
-    
-    # Mostramos todos los registros ordenados por el más reciente
-    actividades = Actividad.query.order_by(Actividad.id.desc()).all()
-    return render_template('consultar.html', actividades=actividades)
-
-@app.route('/eliminar/<int:id>')
-def eliminar(id):
-    # Solo el Administrador tiene permiso para borrar datos
-    if session.get('rol') != 'admin':
-        flash('Acceso denegado: Solo el Administrador puede eliminar registros', 'danger')
-        return redirect(url_for('consultar'))
-    
-    act = Actividad.query.get_or_404(id)
-    
-    # Borrar la foto del servidor si existe para ahorrar espacio
-    if act.foto:
-        foto_path = os.path.join(app.config['UPLOAD_FOLDER'], act.foto)
-        if os.path.exists(foto_path):
-            os.remove(foto_path)
-
-    db.session.delete(act)
-    db.session.commit()
-    flash('Registro eliminado del sistema', 'success')
-    return redirect(url_for('consultar'))
-
-# --- 5. INICIO DE LA APP Y CREACIÓN DE USUARIOS ---
+# --- INICIALIZACIÓN ---
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        
-        # Crear el usuario Admin si la tabla está vacía
-        if not Usuario.query.filter_by(username='admin').first():
-            admin = Usuario(
-                username='admin', 
-                rol='admin', 
-                password=generate_password_hash('admin123')
-            )
-            db.session.add(admin)
-            
-            # Ejemplo para un Analista
-            analista = Usuario(
-                username='analista1', 
-                rol='analista', 
-                password=generate_password_hash('analista2026')
-            )
-            db.session.add(analista)
-            
+        if not Usuarios.query.filter_by(nombre_usuario='admin').first():
+            db.session.add(Usuarios(
+                nombre_usuario='admin', 
+                password=generate_password_hash('admin123'), 
+                rol='administrador'
+            ))
             db.session.commit()
-            print("Base de datos inicializada con usuarios: admin y analista1")
-            
 
-# El puerto 80 es el estándar de la web y suele saltarse bloqueos básicos
-if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=80)

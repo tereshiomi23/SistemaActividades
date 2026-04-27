@@ -3,78 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Actividades - Pequiven</title>
+    <title>Registro Pequiven - Desarrollo Social</title>
     <style>
-        :root {
-            --azul-pequiven: #004a99;
-            --azul-oscuro: #003366;
-            --gris-fondo: #f4f7f9;
-            --blanco: #ffffff;
-            --verde-exito: #d4edda;
-            --verde-texto: #155724;
-            --rojo-error: #f8d7da;
-            --rojo-texto: #721c24;
-        }
-
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; padding: 20px;
-            background-color: var(--gris-fondo);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            background-color: var(--blanco);
-            padding: 30px; border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            width: 100%; max-width: 600px;
-        }
-
-        .header-flex {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; border-bottom: 2px solid var(--gris-fondo);
-            padding-bottom: 10px;
-        }
-
-        h1 { color: var(--azul-pequiven); font-size: 20px; margin: 0; }
-
-        .user-info { font-size: 13px; color: #666; }
-        .btn-logout { color: #d9534f; text-decoration: none; font-weight: bold; margin-left: 10px; }
-
-        /* Estilos para mensajes Flash */
-        .alert { padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: bold; }
-        .alert-success { background-color: var(--verde-exito); color: var(--verde-texto); border: 1px solid #c3e6cb; }
-        .alert-danger { background-color: var(--rojo-error); color: var(--rojo-texto); border: 1px solid #f5c6cb; }
-
-        form { display: grid; gap: 12px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { margin-bottom: 4px; font-weight: 600; color: #444; font-size: 13px; }
-        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        
-        button {
-            margin-top: 15px; padding: 12px;
-            background-color: var(--azul-pequiven); color: white;
-            border: none; border-radius: 6px; font-size: 15px;
-            font-weight: bold; cursor: pointer; transition: background 0.3s;
-        }
-        button:hover { background-color: var(--azul-oscuro); }
-
-        .footer-links { text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-        .footer-links a { color: var(--azul-pequiven); text-decoration: none; font-weight: 600; font-size: 13px; }
+        :root { --azul: #004a99; --azul-dark: #003366; --fondo: #f4f7f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
+        h2 { color: var(--azul); text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--azul); padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        textarea { resize: vertical; }
+        .photo-section { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px dashed var(--azul); margin-top: 20px; }
+        .photo-section label { color: var(--azul); }
+        button { width: 100%; background: var(--azul); color: white; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
+        button:hover { background: var(--azul-dark); }
+        .alert { padding: 12px; margin-bottom: 20px; border-radius: 6px; text-align: center; font-weight: bold; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .footer { text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .footer a { color: var(--azul); text-decoration: none; font-weight: bold; margin: 0 10px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="header-flex">
-            <h1>🚀 Registro de Gestión</h1>
-            <div class="user-info">
-                <span>👤 {{ session['username'] }} ({{ session['rol'] }})</span>
-                <a href="/logout" class="btn-logout">Salir</a>
-            </div>
-        </div>
+        <h2>Registro de Actividades Diarias</h2>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
@@ -83,71 +36,114 @@
             {% endfor %}
           {% endif %}
         {% endwith %}
-        
-        <form action="/registrar" method="POST" enctype="multipart/form-data">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Fecha:</label>
-                    <input type="date" name="fecha" required>
-                </div>
-                <div class="form-group">
-                    <label>Coordinación:</label>
-                    <input type="text" name="coordinacion" placeholder="Ej: Gerencia Social" required>
-                </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Fecha de la Actividad:</label>
+                <input type="date" name="fecha_actividad" required>
             </div>
 
             <div class="form-group">
-                <label>Tipo de Programa:</label>
-                <select name="tipo_programa">
-                    <option value="Pequiven va a la escuela">Pequiven va a la escuela 📦</option>
+                <label>Programa de Gestión:</label>
+                <select id="programa" name="programa_gestion" onchange="actualizarActividades()" required>
+                    <option value="">Seleccione el programa...</option>
+                    <option value="Pequiven va a la escuela">Pequiven va a la escuela</option>
                     <option value="Pequivoluntades">Pequivoluntades</option>
-                    <option value="Fort. de la Gest. Comunitaria">Fort. de la Gest. Comunitaria 🏗️</option>
+                    <option value="Fort. de la Gest. Comunitario">Fort. de la Gest. Comunitario</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>Tipo de Actividad:</label>
-                <input type="text" name="tipo_actividad" placeholder="Ej: Jornada Médica" required>
+                <select id="tipo_actividad" name="tipo_actividad" required>
+                    <option value="">Esperando programa...</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label>Descripción:</label>
-                <input type="text" name="descripcion" placeholder="Resumen de la actividad" required>
+                <label>Nombre de la Institución / Comunidad:</label>
+                <input type="text" name="nombre_institucion" placeholder="Ej: E.B.N. Carabobo" required>
             </div>
 
             <div class="form-group">
-                <label>Ubicación:</label>
-                <input type="text" name="ubicacion" placeholder="Estado / Municipio" required>
+                <label>Descripción de la Actividad:</label>
+                <textarea name="descripcion_actividad" rows="3" placeholder="Indique brevemente qué se realizó..." required></textarea>
             </div>
 
-            <div class="form-row">
+            <div class="form-group">
+                <label>Personal que Asistió:</label>
+                <textarea name="personal_asistio" rows="2" placeholder="Nombres de los responsables..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Dirección:</label>
+                <input type="text" name="direccion" placeholder="Estado, municipio, sector..." required>
+            </div>
+
+            <div class="form-group">
+                <label>Cantidad de Beneficiarios:</label>
+                <input type="number" name="cantidad_beneficiarios" value="0" min="0">
+            </div>
+
+            <div class="photo-section">
+                <label>Evidencias Fotográficas (Máximo 3):</label>
                 <div class="form-group">
-                    <label>Tipo de Ayuda:</label>
-                    <input type="text" name="tipo_ayuda" placeholder="Ej: Medicinas">
+                    <input type="file" name="foto1" accept="image/*" style="margin-bottom: 8px;">
+                    <input type="file" name="foto2" accept="image/*" style="margin-bottom: 8px;">
+                    <input type="file" name="foto3" accept="image/*">
                 </div>
-                <div class="form-group">
-                    <label>Cantidad:</label>
-                    <input type="number" name="cantidad_ayuda" placeholder="0">
-                </div>
+                <small style="color: #666;">Formatos permitidos: JPG, PNG, JPEG.</small>
             </div>
 
-            <div class="form-group">
-                <label>Beneficiarios:</label>
-                <input type="number" name="beneficiarios" placeholder="0" required>
-            </div>
-
-            <div class="form-group">
-                <label>Foto de la Actividad:</label>
-                <input type="file" name="foto" accept="image/*">
-            </div>
-
-            <button type="submit">Guardar Registro 💾</button>
+            <button type="submit">Guardar Registro y Fotos 💾</button>
         </form>
 
-        <div class="footer-links">
-            <a href="/consultar">📊 Ver Historial de Actividades</a>
+        <div class="footer">
+            <a href="/consultar">📊 Ver Historial</a> | 
+            <a href="/logout" style="color: #c9302c;">Cerrar Sesión</a>
         </div>
     </div>
 
+    <script>
+        function actualizarActividades() {
+            const programa = document.getElementById("programa").value;
+            const tipoSelect = document.getElementById("tipo_actividad");
+            tipoSelect.innerHTML = "";
+
+            if (programa === "Pequiven va a la escuela") {
+                const opt = document.createElement("option");
+                opt.value = "Pequiven va a la escuela";
+                opt.textContent = "Pequiven va a la escuela";
+                tipoSelect.appendChild(opt);
+            } 
+            else if (programa === "Pequivoluntades") {
+                const opt = document.createElement("option");
+                opt.value = "Pequivoluntades";
+                opt.textContent = "Pequivoluntades";
+                tipoSelect.appendChild(opt);
+            } 
+            else if (programa === "Fort. de la Gest. Comunitario") {
+                const opciones = [
+                    "Ayuda Médica", 
+                    "Ayuda Social", 
+                    "Ayuda Técnica", 
+                    "Actividades Comunitarias", 
+                    "Inspecciones Técnicas", 
+                    "Reuniones Intersectoriales"
+                ];
+                opciones.forEach(t => {
+                    const opt = document.createElement("option");
+                    opt.value = t;
+                    opt.textContent = t;
+                    tipoSelect.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "Seleccione primero el programa...";
+                tipoSelect.appendChild(opt);
+            }
+        }
+    </script>
 </body>
 </html>

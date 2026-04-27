@@ -3,176 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Gestión - Pequiven</title>
-    
+    <title>Historial de Actividades - Pequiven</title>
     <style>
         :root {
             --azul-pequiven: #004a99;
-            --azul-claro: #f1f7ff;
             --blanco: #ffffff;
-            --gris-texto: #333;
-            --rojo-eliminar: #d9534f;
-            --rojo-hover: #c9302c;
+            --gris-fondo: #f8f9fa;
         }
 
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
-            margin: 0; 
-            padding: 30px;
-            background-color: #f4f7f9; 
-            color: var(--gris-texto);
+            margin: 0; padding: 25px;
+            background-color: var(--gris-fondo);
         }
 
-        .header-container {
+        .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
-        h1 { 
-            color: var(--azul-pequiven);
-            font-size: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+        .header h1 { color: var(--azul-pequiven); font-size: 28px; }
 
-        /* Contenedor de la tabla para scroll en móviles */
-        .table-responsive {
-            background-color: var(--blanco);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        .table-container {
+            background: var(--blanco);
+            padding: 15px;
             border-radius: 10px;
-            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             overflow-x: auto;
         }
 
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            min-width: 900px; /* Asegura que no se amontone la info */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
         }
 
-        th { 
-            background-color: var(--azul-pequiven); 
-            color: white; 
-            padding: 15px 10px;
-            text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-        }
-
-        td { 
-            padding: 12px 10px; 
-            border-bottom: 1px solid #eee;
-            text-align: center;
+        th {
+            background-color: var(--azul-pequiven);
+            color: white;
+            padding: 12px;
+            text-align: left;
             font-size: 14px;
-        }
-
-        tr:hover { 
-            background-color: var(--azul-claro); 
-        }
-
-        /* Estilo para las imágenes */
-        .img-miniatura {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
             border: 1px solid #ddd;
-            transition: transform 0.2s;
         }
 
-        .img-miniatura:hover {
+        td {
+            padding: 10px;
+            border: 1px solid #eee;
+            font-size: 13px;
+            color: #444;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) { background-color: #fcfcfc; }
+        tr:hover { background-color: #f1f7ff; }
+
+        .badge {
+            display: block;
+            font-size: 10px;
+            font-weight: bold;
+            color: #777;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Estilo para las miniaturas de fotos */
+        .photo-gallery {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .thumb:hover {
             transform: scale(1.1);
+            border-color: var(--azul-pequiven);
         }
 
-        /* Botón eliminar */
-        .btn-eliminar {
-            display: inline-block;
-            padding: 8px 12px;
-            background-color: var(--rojo-eliminar);
-            color: white !important;
-            text-decoration: none;
+        .beneficiarios {
             font-weight: bold;
-            border-radius: 5px;
-            font-size: 12px;
-            transition: background 0.3s;
+            color: #28a745;
+            text-align: center;
         }
 
-        .btn-eliminar:hover {
-            background-color: var(--rojo-hover);
-        }
-
-        .back-link {
-            display: inline-block;
+        .btn-container {
+            text-align: center;
             margin-top: 25px;
-            text-decoration: none;
-            color: var(--azul-pequiven);
-            font-weight: bold;
-            font-size: 15px;
         }
 
-        .back-link:hover {
-            text-decoration: underline;
+        .btn-volver {
+            text-decoration: none;
+            background-color: var(--azul-pequiven);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
         }
+
+        .btn-volver:hover { background-color: #003366; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h1>📋 Resumen de Actividades Registradas</h1>
+    <div class="header">
+        <h1>📊 Historial de Actividades Diarias</h1>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
                     <th>Fecha</th>
-                    <th>Programa</th>
-                    <th>Actividad</th>
-                    <th>Coordinación</th>
-                    <th>Ubicación</th>
-                    <th>Ayuda (Cant.)</th>
+                    <th>Programa / Actividad</th>
+                    <th>Institución / Comunidad</th>
+                    <th>Descripción y Evidencias</th>
+                    <th>Personal que Asistió</th>
+                    <th>Dirección / Ubicación</th>
                     <th>Benef.</th>
-                    <th>Evidencia</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for a in actividades %}
                 <tr>
-                    <td><strong>{{ a.fecha }}</strong></td>
-                    <td>{{ a.tipo_programa }}</td>
-                    <td>{{ a.tipo_actividad }}</td>
-                    <td>{{ a.coordinacion }}</td>
-                    <td>{{ a.ubicacion }}</td>
-                    <td>{{ a.tipo_ayuda }} ({{ a.cantidad_ayuda }})</td>
-                    <td>{{ a.beneficiarios }}</td>
+                    <td style="white-space: nowrap;"><strong>{{ a.fecha_actividad.strftime('%d/%m/%Y') }}</strong></td>
                     <td>
-                        {% if a.foto %}
-                        <a href="{{ url_for('static', filename='uploads/' + a.foto) }}" target="_blank">
-                            <img src="{{ url_for('static', filename='uploads/' + a.foto) }}" class="img-miniatura">
-                        </a>
-                        {% else %}
-                        <span style="color: #bbb; font-style: italic;">Sin foto</span>
-                        {% endif %}
+                        <span class="badge">{{ a.programa_gestion }}</span>
+                        {{ a.tipo_actividad }}
                     </td>
+                    <td><strong>{{ a.nombre_institucion }}</strong></td>
                     <td>
-    			{% if session['rol'] == 'admin' %}
-    			<a href="/eliminar/{{ a.id }}" class="btn-eliminar" onclick="return confirm('¿Eliminar?')">
-        		Eliminar 🗑️
-    			</a>
-    			{% else %}
-    			<span style="color: gray;">Sin permisos</span>
-    			{% endif %}
-		     </td>
+                        {{ a.descripcion_actividad }}
+                        
+                        <div class="photo-gallery">
+                            {% if a.foto1 %}
+                                <img src="{{ url_for('static', filename='uploads/' + a.foto1) }}" class="thumb" onclick="window.open(this.src)">
+                            {% endif %}
+                            {% if a.foto2 %}
+                                <img src="{{ url_for('static', filename='uploads/' + a.foto2) }}" class="thumb" onclick="window.open(this.src)">
+                            {% endif %}
+                            {% if a.foto3 %}
+                                <img src="{{ url_for('static', filename='uploads/' + a.foto3) }}" class="thumb" onclick="window.open(this.src)">
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>{{ a.personal_asistio }}</td>
+                    <td>{{ a.direccion }}</td>
+                    <td class="beneficiarios">{{ a.cantidad_beneficiarios }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 30px; color: #999;">No hay registros disponibles.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <a href="/" class="back-link">← Registrar Nueva Actividad</a>
+    <div class="btn-container">
+        <a href="/index" class="btn-volver">← Volver al Formulario</a>
+    </div>
 
 </body>
 </html>
