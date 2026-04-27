@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Actividades - Pequiven</title>
+    <style>
+        :root {
+            --azul-pequiven: #004a99;
+            --azul-oscuro: #003366;
+            --gris-fondo: #f4f7f9;
+            --blanco: #ffffff;
+            --verde-exito: #d4edda;
+            --verde-texto: #155724;
+            --rojo-error: #f8d7da;
+            --rojo-texto: #721c24;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; padding: 20px;
+            background-color: var(--gris-fondo);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--blanco);
+            padding: 30px; border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 100%; max-width: 600px;
+        }
+
+        .header-flex {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 2px solid var(--gris-fondo);
+            padding-bottom: 10px;
+        }
+
+        h1 { color: var(--azul-pequiven); font-size: 20px; margin: 0; }
+
+        .user-info { font-size: 13px; color: #666; }
+        .btn-logout { color: #d9534f; text-decoration: none; font-weight: bold; margin-left: 10px; }
+
+        /* Estilos para mensajes Flash */
+        .alert { padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: bold; }
+        .alert-success { background-color: var(--verde-exito); color: var(--verde-texto); border: 1px solid #c3e6cb; }
+        .alert-danger { background-color: var(--rojo-error); color: var(--rojo-texto); border: 1px solid #f5c6cb; }
+
+        form { display: grid; gap: 12px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { margin-bottom: 4px; font-weight: 600; color: #444; font-size: 13px; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        
+        button {
+            margin-top: 15px; padding: 12px;
+            background-color: var(--azul-pequiven); color: white;
+            border: none; border-radius: 6px; font-size: 15px;
+            font-weight: bold; cursor: pointer; transition: background 0.3s;
+        }
+        button:hover { background-color: var(--azul-oscuro); }
+
+        .footer-links { text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .footer-links a { color: var(--azul-pequiven); text-decoration: none; font-weight: 600; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-flex">
+            <h1>🚀 Registro de Gestión</h1>
+            <div class="user-info">
+                <span>👤 {{ session['username'] }} ({{ session['rol'] }})</span>
+                <a href="/logout" class="btn-logout">Salir</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        <form action="/registrar" method="POST" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Fecha:</label>
+                    <input type="date" name="fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Coordinación:</label>
+                    <input type="text" name="coordinacion" placeholder="Ej: Gerencia Social" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de Programa:</label>
+                <select name="tipo_programa">
+                    <option value="Pequiven va a la escuela">Pequiven va a la escuela 📦</option>
+                    <option value="Pequivoluntades">Pequivoluntades</option>
+                    <option value="Fort. de la Gest. Comunitaria">Fort. de la Gest. Comunitaria 🏗️</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de Actividad:</label>
+                <input type="text" name="tipo_actividad" placeholder="Ej: Jornada Médica" required>
+            </div>
+
+            <div class="form-group">
+                <label>Descripción:</label>
+                <input type="text" name="descripcion" placeholder="Resumen de la actividad" required>
+            </div>
+
+            <div class="form-group">
+                <label>Ubicación:</label>
+                <input type="text" name="ubicacion" placeholder="Estado / Municipio" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tipo de Ayuda:</label>
+                    <input type="text" name="tipo_ayuda" placeholder="Ej: Medicinas">
+                </div>
+                <div class="form-group">
+                    <label>Cantidad:</label>
+                    <input type="number" name="cantidad_ayuda" placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Beneficiarios:</label>
+                <input type="number" name="beneficiarios" placeholder="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Foto de la Actividad:</label>
+                <input type="file" name="foto" accept="image/*">
+            </div>
+
+            <button type="submit">Guardar Registro 💾</button>
+        </form>
+
+        <div class="footer-links">
+            <a href="/consultar">📊 Ver Historial de Actividades</a>
+        </div>
+    </div>
+
+</body>
+</html>

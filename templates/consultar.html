@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Gestión - Pequiven</title>
+    
+    <style>
+        :root {
+            --azul-pequiven: #004a99;
+            --azul-claro: #f1f7ff;
+            --blanco: #ffffff;
+            --gris-texto: #333;
+            --rojo-eliminar: #d9534f;
+            --rojo-hover: #c9302c;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; 
+            padding: 30px;
+            background-color: #f4f7f9; 
+            color: var(--gris-texto);
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 { 
+            color: var(--azul-pequiven);
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Contenedor de la tabla para scroll en móviles */
+        .table-responsive {
+            background-color: var(--blanco);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 900px; /* Asegura que no se amontone la info */
+        }
+
+        th { 
+            background-color: var(--azul-pequiven); 
+            color: white; 
+            padding: 15px 10px;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        td { 
+            padding: 12px 10px; 
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        tr:hover { 
+            background-color: var(--azul-claro); 
+        }
+
+        /* Estilo para las imágenes */
+        .img-miniatura {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            transition: transform 0.2s;
+        }
+
+        .img-miniatura:hover {
+            transform: scale(1.1);
+        }
+
+        /* Botón eliminar */
+        .btn-eliminar {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: var(--rojo-eliminar);
+            color: white !important;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .btn-eliminar:hover {
+            background-color: var(--rojo-hover);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            text-decoration: none;
+            color: var(--azul-pequiven);
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>📋 Resumen de Actividades Registradas</h1>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Programa</th>
+                    <th>Actividad</th>
+                    <th>Coordinación</th>
+                    <th>Ubicación</th>
+                    <th>Ayuda (Cant.)</th>
+                    <th>Benef.</th>
+                    <th>Evidencia</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in actividades %}
+                <tr>
+                    <td><strong>{{ a.fecha }}</strong></td>
+                    <td>{{ a.tipo_programa }}</td>
+                    <td>{{ a.tipo_actividad }}</td>
+                    <td>{{ a.coordinacion }}</td>
+                    <td>{{ a.ubicacion }}</td>
+                    <td>{{ a.tipo_ayuda }} ({{ a.cantidad_ayuda }})</td>
+                    <td>{{ a.beneficiarios }}</td>
+                    <td>
+                        {% if a.foto %}
+                        <a href="{{ url_for('static', filename='uploads/' + a.foto) }}" target="_blank">
+                            <img src="{{ url_for('static', filename='uploads/' + a.foto) }}" class="img-miniatura">
+                        </a>
+                        {% else %}
+                        <span style="color: #bbb; font-style: italic;">Sin foto</span>
+                        {% endif %}
+                    </td>
+                    <td>
+    			{% if session['rol'] == 'admin' %}
+    			<a href="/eliminar/{{ a.id }}" class="btn-eliminar" onclick="return confirm('¿Eliminar?')">
+        		Eliminar 🗑️
+    			</a>
+    			{% else %}
+    			<span style="color: gray;">Sin permisos</span>
+    			{% endif %}
+		     </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a href="/" class="back-link">← Registrar Nueva Actividad</a>
+
+</body>
+</html>
