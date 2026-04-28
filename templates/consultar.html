@@ -3,174 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Actividades - Pequiven</title>
+    <title>Historial - Pequiven</title>
     <style>
-        :root {
-            --azul-pequiven: #004a99;
-            --blanco: #ffffff;
-            --gris-fondo: #f8f9fa;
-        }
+        :root { --azul: #004a99; --fondo: #f4f7f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); margin: 0; padding: 0; }
+        
+        nav { background: var(--azul); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        nav a { color: white; text-decoration: none; margin-left: 20px; }
 
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            margin: 0; padding: 25px;
-            background-color: var(--gris-fondo);
-        }
+        .container { width: 95%; max-width: 1200px; margin: 30px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
+        
+        h2 { color: var(--azul); margin-bottom: 20px; }
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: var(--azul); font-weight: bold; }
+        
+        tr:hover { background: #f9f9f9; }
 
-        .header h1 { color: var(--azul-pequiven); font-size: 28px; }
-
-        .table-container {
-            background: var(--blanco);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1100px;
-        }
-
-        th {
-            background-color: var(--azul-pequiven);
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-size: 14px;
+        .thumb { 
+            width: 60px; 
+            height: 45px; 
+            object-fit: cover; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin-right: 5px; 
             border: 1px solid #ddd;
         }
+        .thumb:hover { transform: scale(1.1); transition: 0.2s; }
 
-        td {
-            padding: 10px;
-            border: 1px solid #eee;
-            font-size: 13px;
-            color: #444;
-            vertical-align: top;
+        .badge { 
+            background: #e1ecf4; 
+            color: #39739d; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 0.85rem; 
         }
 
-        tr:nth-child(even) { background-color: #fcfcfc; }
-        tr:hover { background-color: #f1f7ff; }
-
-        .badge {
-            display: block;
-            font-size: 10px;
-            font-weight: bold;
-            color: #777;
-            margin-bottom: 3px;
-            text-transform: uppercase;
-        }
-
-        /* Estilo para las miniaturas de fotos */
-        .photo-gallery {
-            display: flex;
-            gap: 5px;
-            margin-top: 8px;
-        }
-
-        .thumb {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .thumb:hover {
-            transform: scale(1.1);
-            border-color: var(--azul-pequiven);
-        }
-
-        .beneficiarios {
-            font-weight: bold;
-            color: #28a745;
-            text-align: center;
-        }
-
-        .btn-container {
-            text-align: center;
-            margin-top: 25px;
-        }
-
-        .btn-volver {
-            text-decoration: none;
-            background-color: var(--azul-pequiven);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .btn-volver:hover { background-color: #003366; }
+        .no-data { text-align: center; padding: 40px; color: #888; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>📊 Historial de Actividades Diarias</h1>
-    </div>
+    <nav>
+        <div style="font-weight: bold;">SISTEMA PEQUIVEN</div>
+        <div>
+            <a href="{{ url_for('index') }}">Nuevo Registro</a>
+            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+        </div>
+    </nav>
 
-    <div class="table-container">
+    <div class="container">
+        <h2>Historial de Actividades Sociales</h2>
+        
         <table>
             <thead>
                 <tr>
                     <th>Fecha</th>
-                    <th>Programa / Actividad</th>
-                    <th>Institución / Comunidad</th>
-                    <th>Descripción y Evidencias</th>
-                    <th>Personal que Asistió</th>
-                    <th>Dirección / Ubicación</th>
+                    <th>Programa / Tipo</th>
+                    <th>Institución y Descripción</th>
+                    <th>Fotos</th>
+                    <th>Personal</th>
                     <th>Benef.</th>
                 </tr>
             </thead>
             <tbody>
                 {% for a in actividades %}
                 <tr>
-                    <td style="white-space: nowrap;"><strong>{{ a.fecha_actividad.strftime('%d/%m/%Y') }}</strong></td>
+                    <td>{{ a.fecha_actividad.strftime('%d/%m/%Y') }}</td>
                     <td>
-                        <span class="badge">{{ a.programa_gestion }}</span>
-                        {{ a.tipo_actividad }}
+                        <span class="badge">{{ a.programa_gestion }}</span><br>
+                        <small style="color: #666;">{{ a.tipo_activity }}</small>
                     </td>
-                    <td><strong>{{ a.nombre_institucion }}</strong></td>
                     <td>
-                        {{ a.descripcion_actividad }}
-                        
-                        <div class="photo-gallery">
-                            {% if a.foto1 %}
-                                <img src="{{ url_for('static', filename='uploads/' + a.foto1) }}" class="thumb" onclick="window.open(this.src)">
-                            {% endif %}
-                            {% if a.foto2 %}
-                                <img src="{{ url_for('static', filename='uploads/' + a.foto2) }}" class="thumb" onclick="window.open(this.src)">
-                            {% endif %}
-                            {% if a.foto3 %}
-                                <img src="{{ url_for('static', filename='uploads/' + a.foto3) }}" class="thumb" onclick="window.open(this.src)">
-                            {% endif %}
-                        </div>
+                        <strong>{{ a.nombre_institucion }}</strong><br>
+                        <small>{{ a.descripcion_actividad }}</small>
                     </td>
-                    <td>{{ a.personal_asistio }}</td>
-                    <td>{{ a.direccion }}</td>
-                    <td class="beneficiarios">{{ a.cantidad_beneficiarios }}</td>
+                    <td>
+                        {% if a.foto1 %}<img src="{{ url_for('static', filename='uploads/' + a.foto1) }}" class="thumb" onclick="window.open(this.src)">{% endif %}
+                        {% if a.foto2 %}<img src="{{ url_for('static', filename='uploads/' + a.foto2) }}" class="thumb" onclick="window.open(this.src)">{% endif %}
+                        {% if a.foto3 %}<img src="{{ url_for('static', filename='uploads/' + a.foto3) }}" class="thumb" onclick="window.open(this.src)">{% endif %}
+                    </td>
+                    <td><small>{{ a.personal_asistio }}</small></td>
+                    <td><strong>{{ a.cantidad_beneficiarios }}</strong></td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 30px; color: #999;">No hay registros disponibles.</td>
+                    <td colspan="6" class="no-data">No se han encontrado registros.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-
-    <div class="btn-container">
-        <a href="/index" class="btn-volver">← Volver al Formulario</a>
     </div>
 
 </body>
