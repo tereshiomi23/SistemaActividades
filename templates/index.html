@@ -4,103 +4,242 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro Pequiven - Desarrollo Social</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --azul: #004a99; --azul-dark: #003366; --fondo: #f4f7f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
-        h2 { color: var(--azul); text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--azul); padding-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        textarea { resize: vertical; }
-        .photo-section { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px dashed var(--azul); margin-top: 20px; }
-        .photo-section label { color: var(--azul); }
-        button { width: 100%; background: var(--azul); color: white; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
-        button:hover { background: var(--azul-dark); }
-        .alert { padding: 12px; margin-bottom: 20px; border-radius: 6px; text-align: center; font-weight: bold; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .footer { text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-        .footer a { color: var(--azul); text-decoration: none; font-weight: bold; margin: 0 10px; }
+        :root { 
+            /* El azul petróleo de la imagen de referencia */
+            --azul-acento: #3b526d; 
+            --azul-acento-hover: #2d3f54;
+            --blanco: #ffffff;
+            --glass: rgba(255, 255, 255, 0.35); 
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
+
+        /* FONDO CON IMAGEN */
+        .background-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url("{{ url_for('static', filename='fondo_desarrollo_social.jpg') }}"); 
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: -1;
+        }
+
+        /* Navbar estilo Cristal */
+        nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .brand { font-weight: 700; letter-spacing: 1px; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 0.85rem; font-weight: 600; }
+
+        .main-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* TARJETA TIPO CRISTAL */
+        .container { 
+            background: var(--glass); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 40px; 
+            border-radius: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
+            width: 100%; 
+            max-width: 650px; 
+        }
+
+        h2 { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        
+        label { 
+            display: block; 
+            font-weight: 700; 
+            margin-bottom: 8px; 
+            font-size: 0.75rem; 
+            color: #ffffff; 
+            text-transform: uppercase; 
+        }
+        
+        /* Inputs estilizados */
+        input, select, textarea { 
+            width: 100%; 
+            padding: 14px; 
+            background: rgba(255, 255, 255, 0.85); 
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            color: #1e293b; 
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            background: #ffffff;
+            /* Resplandor con el nuevo azul */
+            box-shadow: 0 0 0 4px rgba(59, 82, 109, 0.2);
+        }
+
+        .photo-section { 
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px dashed rgba(255, 255, 255, 0.5); 
+            margin-top: 20px;
+        }
+
+        /* BOTÓN ACTUALIZADO AL NUEVO AZUL */
+        button { 
+            width: 100%; 
+            background: var(--azul-acento);
+            color: white; 
+            padding: 16px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 82, 109, 0.3);
+        }
+
+        button:hover { 
+            background: var(--azul-acento-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 82, 109, 0.4);
+        }
+
+        .footer { text-align: center; margin-top: 25px; padding-top: 15px; }
+        .footer a { color: white; text-decoration: none; font-weight: 600; font-size: 0.85rem; opacity: 0.9; }
+        .footer a:hover { opacity: 1; text-decoration: underline; }
+
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600; }
+        .alert-success { background: rgba(40, 167, 69, 0.8); color: #fff; }
+        .alert-danger { background: rgba(220, 53, 69, 0.8); color: #fff; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Registro de Actividades Diarias</h2>
+    <div class="background-container"></div>
+    <div class="background-overlay"></div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+    <nav>
+        <div class="brand">PEQUIVEN SOCIAL</div>
+        <div class="nav-links">
+            <a href="/consultar">HISTORIAL</a>
+            <a href="/logout" style="color: #ff8e8e;">CERRAR SESIÓN</a>
+        </div>
+    </nav>
 
-        <form method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-                <label>Fecha de la Actividad:</label>
-                <input type="date" name="fecha_actividad" required>
-            </div>
+    <div class="main-wrapper">
+        <div class="container">
+            <h2>Registro de Actividades</h2>
 
-            <div class="form-group">
-                <label>Programa de Gestión:</label>
-                <select id="programa" name="programa_gestion" onchange="actualizarActividades()" required>
-                    <option value="">Seleccione el programa...</option>
-                    <option value="Pequiven va a la escuela">Pequiven va a la escuela</option>
-                    <option value="Pequivoluntades">Pequivoluntades</option>
-                    <option value="Fort. de la Gest. Comunitario">Fort. de la Gest. Comunitario</option>
-                </select>
-            </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
 
-            <div class="form-group">
-                <label>Tipo de Actividad:</label>
-                <select id="tipo_actividad" name="tipo_actividad" required>
-                    <option value="">Esperando programa...</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Nombre de la Institución / Comunidad:</label>
-                <input type="text" name="nombre_institucion" placeholder="Ej: E.B.N. Carabobo" required>
-            </div>
-
-            <div class="form-group">
-                <label>Descripción de la Actividad:</label>
-                <textarea name="descripcion_actividad" rows="3" placeholder="Indique brevemente qué se realizó..." required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Personal que Asistió:</label>
-                <textarea name="personal_asistio" rows="2" placeholder="Nombres de los responsables..." required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Dirección:</label>
-                <input type="text" name="direccion" placeholder="Estado, municipio, sector..." required>
-            </div>
-
-            <div class="form-group">
-                <label>Cantidad de Beneficiarios:</label>
-                <input type="number" name="cantidad_beneficiarios" value="0" min="0">
-            </div>
-
-            <div class="photo-section">
-                <label>Evidencias Fotográficas (Máximo 3):</label>
+            <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <input type="file" name="foto1" accept="image/*" style="margin-bottom: 8px;">
-                    <input type="file" name="foto2" accept="image/*" style="margin-bottom: 8px;">
-                    <input type="file" name="foto3" accept="image/*">
+                    <label>Fecha de la Actividad:</label>
+                    <input type="date" name="fecha_actividad" required>
                 </div>
-                <small style="color: #666;">Formatos permitidos: JPG, PNG, JPEG.</small>
+
+                <div class="form-group">
+                    <label>Programa de Gestión:</label>
+                    <select id="programa" name="programa_gestion" onchange="actualizarActividades()" required>
+                        <option value="">Seleccione el programa...</option>
+                        <option value="Pequiven va a la escuela">Pequiven va a la escuela</option>
+                        <option value="Pequivoluntades">Pequivoluntades</option>
+                        <option value="Fort. de la Gest. Comunitario">Fort. de la Gest. Comunitario</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Actividad:</label>
+                    <select id="tipo_actividad" name="tipo_actividad" required>
+                        <option value="">Esperando programa...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Nombre de la Institución:</label>
+                    <input type="text" name="nombre_institucion" placeholder="Ej: E.B.N. Carabobo" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea name="descripcion_actividad" rows="3" placeholder="Indique brevemente qué se realizó..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Personal Asistente:</label>
+                    <textarea name="personal_asistio" rows="2" placeholder="Nombres de los responsables..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Dirección:</label>
+                    <input type="text" name="direccion" placeholder="Estado, municipio, sector..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Cantidad de Beneficiarios:</label>
+                    <input type="number" name="cantidad_beneficiarios" value="0" min="0">
+                </div>
+
+                <div class="photo-section">
+                    <label>Evidencias Fotográficas</label>
+                    <input type="file" name="foto1" accept="image/*" style="background:none; color:white; margin-bottom:10px; border:none">
+                    <input type="file" name="foto2" accept="image/*" style="background:none; color:white; margin-bottom:10px; border:none">
+                    <input type="file" name="foto3" accept="image/*" style="background:none; color:white; border:none">
+                </div>
+
+                <button type="submit">Guardar Registro 💾</button>
+            </form>
+
+            <div class="footer">
+                <a href="/consultar">📊 Ver Historial de Reportes</a>
             </div>
-
-            <button type="submit">Guardar Registro y Fotos 💾</button>
-        </form>
-
-        <div class="footer">
-            <a href="/consultar">📊 Ver Historial</a> | 
-            <a href="/logout" style="color: #c9302c;">Cerrar Sesión</a>
         </div>
     </div>
 
@@ -123,14 +262,7 @@
                 tipoSelect.appendChild(opt);
             } 
             else if (programa === "Fort. de la Gest. Comunitario") {
-                const opciones = [
-                    "Ayuda Médica", 
-                    "Ayuda Social", 
-                    "Ayuda Técnica", 
-                    "Actividades Comunitarias", 
-                    "Inspecciones Técnicas", 
-                    "Reuniones Intersectoriales"
-                ];
+                const opciones = ["Ayuda Médica", "Ayuda Social", "Ayuda Técnica", "Actividades Comunitarias", "Inspecciones Técnicas", "Reuniones Intersectoriales"];
                 opciones.forEach(t => {
                     const opt = document.createElement("option");
                     opt.value = t;

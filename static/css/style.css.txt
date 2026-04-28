@@ -1,0 +1,66 @@
+:root {
+    --nav-dark: #0b0e14;
+    --accent: #00f2ff; /* Color cian brillante para resaltar */
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --text-light: #ffffff;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top right, #1a2a6c, #b21f1f, #fdbb2d); /* Fondo dinámico oscuro */
+    background-attachment: fixed;
+    color: white;
+}
+
+/* Navbar Estilo Moderno */
+nav {
+    background: var(--nav-dark);
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.nav-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    margin-left: 25px;
+    font-weight: 300;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.nav-links a:hover { color: var(--accent); }
+
+.btn-contact {
+    background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+    padding: 10px 20px;
+    border-radius: 25px;
+    color: white !important;
+    text-transform: uppercase;
+    font-weight: 600 !important;
+    letter-spacing: 1px;
+}
+
+/* Tarjeta Estilo Vidrio (Glassmorphism) */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    margin-top: 50px;
+}
+
+h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: -webkit-linear-gradient(#fff, #999);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
