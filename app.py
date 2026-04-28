@@ -43,7 +43,6 @@ class Actividades(db.Model):
     direccion = db.Column(db.Text, nullable=False)
     cantidad_beneficiarios = db.Column(db.Integer, default=0)
     
-    # Campos para guardar los nombres de las imágenes
     foto1 = db.Column(db.String(255), nullable=True)
     foto2 = db.Column(db.String(255), nullable=True)
     foto3 = db.Column(db.String(255), nullable=True)
@@ -51,7 +50,8 @@ class Actividades(db.Model):
 # --- FUNCIONES DE APOYO ---
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1).lower() in app.config['ALLOWED_EXTENSIONS']
+    # CORRECCIÓN: Se agrega [-1] para obtener la extensión como string
+    return '.' in filename and filename.rsplit('.', 1)[-1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 # --- RUTAS ---
 
@@ -85,8 +85,7 @@ def index():
             for i in range(1, 4):
                 f = request.files.get(f'foto{i}')
                 if f and f.filename != '' and allowed_file(f.filename):
-                    # Nombre único: fecha_hora_numero_nombreoriginal.jpg
-                    ext = f.filename.rsplit('.', 1).lower()
+                    ext = f.filename.rsplit('.', 1)[-1].lower()
                     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                     filename = secure_filename(f"{timestamp}_{i}.{ext}")
                     f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -94,6 +93,7 @@ def index():
                 else:
                     nombres_fotos.append(None)
 
+            # Creación del registro en la base de datos
             nueva_acta = Actividades(
                 usuario_id=session['user_id'],
                 fecha_actividad=datetime.strptime(request.form['fecha_actividad'], '%Y-%m-%d'),
@@ -104,9 +104,11 @@ def index():
                 personal_asistio=request.form['personal_asistio'],
                 direccion=request.form['direccion'],
                 cantidad_beneficiarios=int(request.form['cantidad_beneficiarios'] or 0),
-                foto1=nombres_fotos,
-                foto2=nombres_fotos,
-                foto3=nombres_fotos
+                
+                # ESTA ES LA PARTE CLAVE: Se usan los índices, [1] y
+                foto1=nombres_fotos[0],
+                foto2=nombres_fotos[1],
+                foto3=nombres_fotos[2]
             )
             db.session.add(nueva_acta)
             db.session.commit()
